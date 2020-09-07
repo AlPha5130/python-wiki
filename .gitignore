@@ -1,0 +1,4 @@
+__pycache__
+*.txt
+*.text~
+test.py
