@@ -28,7 +28,6 @@ class BaseBot(object):
         return self.__url
 
     async def login(self):
-        client = self.client
         print(f'Logging into {self.sitename} ...')
         login_token = await self.get_token('login')['logintoken']
         login_param = {
@@ -38,7 +37,7 @@ class BaseBot(object):
             "format": "json",
             "lgtoken": login_token
         }
-        response = await client.post(self.url, data=login_param)
+        response = await self.client.post(self.url, data=login_param)
         data = response.json()
         if data['login']['result'] == 'Success':
             print(f'Logged into {self.sitename} as {self.username}.')
