@@ -30,15 +30,7 @@ class BaseBot(object):
     async def login(self):
         client = self.client
         print(f'Logging into {self.sitename} ...')
-        meta_token_param = {
-            "action": "query",
-            "meta": "tokens",
-            "type": "login",
-            "format": "json"
-        }
-        response = await client.get(url=self.url, params=meta_token_param)
-        data = response.json()
-        login_token = data['query']['tokens']['logintoken']
+        login_token = await self.get_token('login')['logintoken']
         login_param = {
             "action": "login",
             "lgname": self.username,

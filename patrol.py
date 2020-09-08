@@ -7,7 +7,6 @@ class PatrolBot(MultiplePageBot):
         super().__init__(sitename, username, password, api_loc)
 
     async def patrol(self):
-        client = self.client
         tokens = await self.get_token('patrol|rollback')
         patrol_token = tokens['patroltoken']
         rollback_token = tokens['rollbacktoken']
