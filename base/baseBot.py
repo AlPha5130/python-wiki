@@ -56,3 +56,14 @@ class BaseBot(object):
 
     async def close(self):
         await self.client.aclose()
+
+    async def get_token(self, type):
+        token_param = {
+            "action": "query",
+            "meta": "tokens",
+            "type": type,
+            "format": "json",
+        }
+        response = await self.client.get(url=self.url, params=token_param)
+        data = response.json()
+        return data['query']['tokens']

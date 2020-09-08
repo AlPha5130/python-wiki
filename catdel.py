@@ -16,18 +16,8 @@ class CatdelBot(MultiplePageBot):
         self.__cat = value
 
     async def delete(self):
-        client = self.client
-        meta_token_param = {
-            "action": "query",
-            "meta": "tokens",
-            "type": "csrf",
-            "format": "json",
-        }
-        response = await client.get(url=self.url, params=meta_token_param)
-        data = response.json()
-        csrf_token = data['query']['tokens']['csrftoken']
+        csrf_token = await self.get_token('csrf')['csrftoken']
         print("Retrieving pages...")
-        indicate = 1
         page_query_param = {
             "action": "query",
             "list": "categorymembers",
@@ -36,33 +26,21 @@ class CatdelBot(MultiplePageBot):
             "cmlimit": 20,
             "format": "json"
         }
-        while indicate:
-            response = await client.get(url=self.url, params=page_query_param)
-            data = response.json()
-            if 'continue' in data:
-                cont_param = data['continue']
-                page_query_param.update(cont_param)
-            else:
-                indicate = 0
-            entries = data['query']['categorymembers']
-            if len(entries) == 0:
-                print("No pages or files.")
-                indicate = 0
-            else:
-                for page in entries:
-                    print(f"\nTitle: {page['title']}\n")
-                    if input("Delete this? [y/n] ") == 'y':
-                        reason = input("Delete reason: ")
-                        if reason == "":
-                            reason = f"机器人：删除所有来自{self.category}分类的页面"
-                        delete_param = {
-                            "action": "delete",
-                            "title": page['title'],
-                            "token": csrf_token,
-                            "reason": reason,
-                            "format": "json"
-                        }
-                        self.create_task(delete_param)
+        entries = await self.query_page_loop(page_query_param, 'categorymembers')
+        for page in entries:
+            print()
+            print(f" {page['title']} ".center(36, '='))
+            if input("Delete this? [y/n] ") == 'y':
+                reason = input(
+                    "Delete reason: ") or f"机器人：删除所有来自{self.category}分类的页面"
+                delete_param = {
+                    "action": "delete",
+                    "title": page['title'],
+                    "token": csrf_token,
+                    "reason": reason,
+                    "format": "json"
+                }
+                self.create_task(delete_param)
         await self.run_tasks()
         self.__handle_result()
 
