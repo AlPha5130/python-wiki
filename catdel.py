@@ -16,7 +16,8 @@ class CatdelBot(MultiplePageBot):
         self.__cat = value
 
     async def delete(self):
-        csrf_token = await self.get_token('csrf')['csrftoken']
+        tokens = await self.get_token('csrf')
+        csrf_token = tokens['csrftoken']
         print("Retrieving pages...")
         page_query_param = {
             "action": "query",

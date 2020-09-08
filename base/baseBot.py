@@ -29,7 +29,8 @@ class BaseBot(object):
 
     async def login(self):
         print(f'Logging into {self.sitename} ...')
-        login_token = await self.get_token('login')['logintoken']
+        tokens = await self.get_token('login')
+        login_token = tokens['logintoken']
         login_param = {
             "action": "login",
             "lgname": self.username,
