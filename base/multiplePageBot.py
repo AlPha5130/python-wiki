@@ -16,14 +16,12 @@ class MultiplePageBot(BaseBot):
         if self.__task_list:
             await asyncio.gather(*self.__task_list)
 
-    async def __send_request(self, body):
-        await asyncio.sleep(1)
-        response = await self.client.post(self.url, data=body)
-        self.__result.append(response.json())
+    async def __send_request(self, data, method):
+        self.__result.append(await self.send_request(data, method))
 
-    def create_task(self, params):
+    def create_task(self, params, method):
         self.__task_list.append(asyncio.create_task(
-            self.__send_request(params)))
+            self.__send_request(params, method)))
 
     async def query_page_loop(self, query_param, result_key):
         looping = True

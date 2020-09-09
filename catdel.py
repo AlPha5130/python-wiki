@@ -29,8 +29,7 @@ class CatdelBot(MultiplePageBot):
         }
         entries = await self.query_page_loop(page_query_param, 'categorymembers')
         for page in entries:
-            print()
-            print(f" {page['title']} ".center(36, '='))
+            self.print_page(page)
             if input("Delete this? [y/n] ") == 'y':
                 reason = input(
                     "Delete reason: ") or f"机器人：删除所有来自{self.category}分类的页面"
@@ -41,7 +40,7 @@ class CatdelBot(MultiplePageBot):
                     "reason": reason,
                     "format": "json"
                 }
-                self.create_task(delete_param)
+                self.create_task(delete_param, 'post')
         await self.run_tasks()
         self.__handle_result()
 

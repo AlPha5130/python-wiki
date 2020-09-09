@@ -22,10 +22,12 @@ class PatrolBot(MultiplePageBot):
         print("Retrieving edits...")
         entries = await self.query_page_loop(rc_query_param, 'recentchanges')
         for item in entries:
-            print()
-            print(f" {item['title']} ".center(36, '='))
-            print(
-                f"User: {item['user']}\nSummary: {item['comment']}\nTime: {item['timestamp']}\n")
+            props = {
+                "User": item['user'],
+                "Summary": item['comment'],
+                "Time": item['timestamp']
+            }
+            self.print_page(item['title'], props)
             action = '1'
             while action not in 'prn' or action == '':
                 action = input(
@@ -39,7 +41,7 @@ class PatrolBot(MultiplePageBot):
                     "token": patrol_token,
                     "format": "json"
                 }
-                self.create_task(patrol_param)
+                self.create_task(patrol_param, 'post')
             elif action == 'r':
                 reason = input("Rollback reason (Default: <none>):")
                 rollback_param = {
@@ -51,7 +53,7 @@ class PatrolBot(MultiplePageBot):
                 }
                 if reason != "":
                     rollback_param["summary"] = reason
-                self.create_task(rollback_param)
+                self.create_task(rollback_param, 'post')
         await self.run_tasks()
         self.__handle_result()
 

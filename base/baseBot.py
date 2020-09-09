@@ -48,6 +48,15 @@ class BaseBot(object):
 
     async def close(self):
         await self.client.aclose()
+    
+    async def send_request(self, data, method):
+        await asyncio.sleep(1)
+        if method == 'get':
+            response = await self.client.get(self.url, params=data)
+            return response.json()
+        elif method == 'post':
+            response = await self.client.post(self.url, data=data)
+            return response.json()
 
     async def get_token(self, type):
         token_param = {
@@ -59,3 +68,10 @@ class BaseBot(object):
         response = await self.client.get(url=self.url, params=token_param)
         data = response.json()
         return data['query']['tokens']
+
+    def print_page(self, page, params=None):
+        page = f' {page} '
+        print(f"\n{page:=^36}")
+        if params:
+            print(*(f"{k}: {v}" for k, v in params.items()),
+                  sep='\n', end='\n\n')
