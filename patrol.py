@@ -21,41 +21,44 @@ class PatrolBot(MultiplePageBot):
         }
         print("Retrieving edits...")
         entries = await self.query_page_loop(rc_query_param, 'recentchanges')
-        for item in entries:
-            props = {
-                "User": item['user'],
-                "Summary": item['comment'],
-                "Time": item['timestamp']
-            }
-            self.print_page(item['title'], props)
-            action = '1'
-            while action not in 'prn' or action == '':
-                action = input(
-                    "What to do with this? [(p)atrol|(r)ollback|(n)othing] ")
-                if action not in 'prn' or action == '':
-                    print("Sorry, try again.")
-            if action == 'p':
-                patrol_param = {
-                    "action": "patrol",
-                    "rcid": item['rcid'],
-                    "token": patrol_token,
-                    "format": "json"
+        if len(entries) == 0:
+            print("No unpatrolled edits.")
+        else:
+            for item in entries:
+                props = {
+                    "User": item['user'],
+                    "Summary": item['comment'],
+                    "Time": item['timestamp']
                 }
-                self.create_task(patrol_param, 'post')
-            elif action == 'r':
-                reason = input("Rollback reason (Default: <none>):")
-                rollback_param = {
-                    "action": "rollback",
-                    "title": item['title'],
-                    "user": item['user'],
-                    "token": rollback_token,
-                    "format": "json"
-                }
-                if reason != "":
-                    rollback_param["summary"] = reason
-                self.create_task(rollback_param, 'post')
-        await self.run_tasks()
-        self.__handle_result()
+                self.print_page(item['title'], props)
+                action = '1'
+                while action not in 'prn' or action == '':
+                    action = input(
+                        "What to do with this? [(p)atrol|(r)ollback|(n)othing] ")
+                    if action not in 'prn' or action == '':
+                        print("Sorry, try again.")
+                if action == 'p':
+                    patrol_param = {
+                        "action": "patrol",
+                        "rcid": item['rcid'],
+                        "token": patrol_token,
+                        "format": "json"
+                    }
+                    self.create_task(patrol_param, 'post')
+                elif action == 'r':
+                    reason = input("Rollback reason (Default: <none>):")
+                    rollback_param = {
+                        "action": "rollback",
+                        "title": item['title'],
+                        "user": item['user'],
+                        "token": rollback_token,
+                        "format": "json"
+                    }
+                    if reason != "":
+                        rollback_param["summary"] = reason
+                    self.create_task(rollback_param, 'post')
+            await self.run_tasks()
+            self.__handle_result()
 
     def __handle_result(self):
         print()

@@ -27,8 +27,7 @@ class MultiplePageBot(BaseBot):
         looping = True
         result = []
         while looping:
-            response = await self.client.get(url=self.url, params=query_param)
-            data = response.json()
+            data = await self.send_request(query_param, 'get')
             if 'continue' in data:
                 continue_param = data['continue']
                 query_param.update(continue_param)

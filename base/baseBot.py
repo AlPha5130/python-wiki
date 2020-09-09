@@ -8,7 +8,7 @@ class BaseBot(object):
     '''
 
     def __init__(self, sitename: str, username: str, password: str, api_loc: str):
-        self.client = httpx.AsyncClient()
+        self.__client = httpx.AsyncClient()
         self.__sitename = sitename
         self.__api_loc = api_loc
         self.__username = username
@@ -38,24 +38,24 @@ class BaseBot(object):
             "format": "json",
             "lgtoken": login_token
         }
-        response = await self.client.post(self.url, data=login_param)
-        data = response.json()
+        data = await self.send_request(login_param, 'post')
         if data['login']['result'] == 'Success':
             print(f'Logged into {self.sitename} as {self.username}.')
         else:
             print("An error occurred.")
+            print(data)
             raise RuntimeError("Failed logging in.") from None
 
     async def close(self):
-        await self.client.aclose()
+        await self.__client.aclose()
     
     async def send_request(self, data, method):
-        await asyncio.sleep(1)
         if method == 'get':
-            response = await self.client.get(self.url, params=data)
+            response = await self.__client.get(self.url, params=data)
             return response.json()
         elif method == 'post':
-            response = await self.client.post(self.url, data=data)
+            await asyncio.sleep(1)
+            response = await self.__client.post(self.url, data=data)
             return response.json()
 
     async def get_token(self, type):
@@ -65,8 +65,7 @@ class BaseBot(object):
             "type": type,
             "format": "json",
         }
-        response = await self.client.get(url=self.url, params=token_param)
-        data = response.json()
+        data = await self.send_request(token_param, 'get')
         return data['query']['tokens']
 
     def print_page(self, page, params=None):

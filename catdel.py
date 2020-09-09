@@ -28,21 +28,24 @@ class CatdelBot(MultiplePageBot):
             "format": "json"
         }
         entries = await self.query_page_loop(page_query_param, 'categorymembers')
-        for page in entries:
-            self.print_page(page)
-            if input("Delete this? [y/n] ") == 'y':
-                reason = input(
-                    "Delete reason: ") or f"机器人：删除所有来自{self.category}分类的页面"
-                delete_param = {
-                    "action": "delete",
-                    "title": page['title'],
-                    "token": csrf_token,
-                    "reason": reason,
-                    "format": "json"
-                }
-                self.create_task(delete_param, 'post')
-        await self.run_tasks()
-        self.__handle_result()
+        if len(entries) == 0:
+            print("No pages or files.")
+        else:
+            for page in entries:
+                self.print_page(page)
+                if input("Delete this? [y/n] ") == 'y':
+                    reason = input(
+                        "Delete reason: ") or f"机器人：删除所有来自{self.category}分类的页面"
+                    delete_param = {
+                        "action": "delete",
+                        "title": page['title'],
+                        "token": csrf_token,
+                        "reason": reason,
+                        "format": "json"
+                    }
+                    self.create_task(delete_param, 'post')
+            await self.run_tasks()
+            self.__handle_result()
 
     def __handle_result(self):
         for item in self.result:
