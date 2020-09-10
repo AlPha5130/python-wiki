@@ -54,7 +54,7 @@ class BaseBot(object):
             response = await self.__client.get(self.url, params=data)
             return response.json()
         elif method == 'post':
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
             response = await self.__client.post(self.url, data=data)
             return response.json()
 
@@ -70,7 +70,7 @@ class BaseBot(object):
 
     def print_page(self, page, params=None):
         page = f' {page} '
-        print(f"\n{page:=^36}")
+        print(f"\n{page:=^40}")
         if params:
             print(*(f"{k}: {v}" for k, v in params.items()),
                   sep='\n', end='\n\n')

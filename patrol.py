@@ -44,7 +44,7 @@ class PatrolBot(MultiplePageBot):
                         "token": patrol_token,
                         "format": "json"
                     }
-                    self.create_task(patrol_param, 'post')
+                    self.__handle_result(await self.send_request(patrol_param, 'post'))
                 elif action == 'r':
                     reason = input("Rollback reason (Default: <none>):")
                     rollback_param = {
@@ -56,17 +56,13 @@ class PatrolBot(MultiplePageBot):
                     }
                     if reason != "":
                         rollback_param["summary"] = reason
-                    self.create_task(rollback_param, 'post')
-            await self.run_tasks()
-            self.__handle_result()
+                    self.__handle_result(await self.send_request(patrol_param, 'post'))
 
-    def __handle_result(self):
-        print()
-        for item in self.result:
-            if 'patrol' in item:
-                print(f"Patrolled {item['patrol']['title']}.")
-            else:
-                print(item)
+    def __handle_result(self, item):
+        if 'patrol' in item:
+            print(f"Patrolled {item['patrol']['title']}.")
+        else:
+            print(item)
 
 
 if __name__ == "__main__":
