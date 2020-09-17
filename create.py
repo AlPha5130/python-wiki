@@ -6,7 +6,7 @@ class CreateRedirectBot(MultiplePageBot):
     async def __init__(self, sitename, username, password, api_loc):
         await super().__init__(sitename, username, password, api_loc)
 
-    async def create(self, file: str):
+    async def create_redirect(self, file: str):
         client = self.client
         csrf_token_param = {
             "action": "query",
@@ -24,7 +24,6 @@ class CreateRedirectBot(MultiplePageBot):
                 "title": dest_page,
                 "text": f"#重定向 [[{page}]]",
                 "summary": f"机器人：创建重定向页面至[[{page}]]",
-                "minor": True,
                 "bot": True,
                 "createonly": True,
                 "format": "json",
@@ -46,6 +45,6 @@ if __name__ == '__main__':
     async def main():
         bot = await CreateRedirectBot('https://minecraft-zh.gamepedia.com',
                                       'MyNe70bot@Misaka', 'kgsvs6mil2hsqkorp9v5eec9f57c3tgs', '/api.php')
-        await bot.create("page.txt")
+        await bot.create_redirect("page.txt")
         await asyncio.sleep(1)
     asyncio.run(main())

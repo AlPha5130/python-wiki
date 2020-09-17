@@ -32,11 +32,8 @@ class PatrolBot(MultiplePageBot):
                 }
                 self.print_page(item['title'], props)
                 action = '1'
-                while action not in 'prn' or action == '':
-                    action = input(
-                        "What to do with this? [(p)atrol|(r)ollback|(n)othing] ")
-                    if action not in 'prn' or action == '':
-                        print("Sorry, try again.")
+                while (action := input("What to do with this? [(p)atrol, (r)ollback, (n)othing] ")) not in 'prn':
+                    print("Sorry, try again.")
                 if action == 'p':
                     patrol_param = {
                         "action": "patrol",
