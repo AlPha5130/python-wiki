@@ -69,8 +69,7 @@ class BaseBot(object):
         return data['query']['tokens']
 
     def print_page(self, page, params=None):
-        page = f' {page} '
-        print(f"\n{page:=^40}")
+        print(f"\n>>> {page} <<<")
         if params:
             print(*(f"{k}: {v}" for k, v in params.items()),
                   sep='\n', end='\n\n')

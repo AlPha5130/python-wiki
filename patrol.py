@@ -53,7 +53,7 @@ class PatrolBot(MultiplePageBot):
                     }
                     if reason != "":
                         rollback_param["summary"] = reason
-                    self.__handle_result(await self.send_request(patrol_param, 'post'))
+                    self.__handle_result(await self.send_request(rollback_param, 'post'))
 
     def __handle_result(self, item):
         if 'patrol' in item:
