@@ -17,7 +17,8 @@ class PatrolBot(MultiplePageBot):
             "rcshow": "!patrolled",
             "rcprop": "title|user|timestamp|ids|comment",
             "rclimit": 20,
-            "format": "json"
+            "format": "json",
+            "formatversion": 2
         }
         print("Retrieving edits...")
         entries = await self.query_page_loop(rc_query_param, 'recentchanges')
@@ -30,9 +31,9 @@ class PatrolBot(MultiplePageBot):
                     "Summary": item['comment'],
                     "Time": item['timestamp']
                 }
-                self.print_page(item['title'], props)
+                self.print_page(item['title'], **props)
                 action = '1'
-                while (action := input("What to do with this? [(p)atrol, (r)ollback, (n)othing] ")) not in 'prn':
+                while (action := input("What to do with this? [(p)atrol, (r)ollback, (n)othing] ")) == '' or action not in 'prn':
                     print("Sorry, try again.")
                 if action == 'p':
                     patrol_param = {

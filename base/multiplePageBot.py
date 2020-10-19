@@ -5,9 +5,8 @@ import asyncio
 class MultiplePageBot(BaseBot):
     def __init__(self, sitename: str, username: str, password: str, api_loc: str):
         super().__init__(sitename, username, password, api_loc)
-        self.__task_list = []
         self.__result = []
-        self.__batch_limit = 25
+        self.__queue = asyncio.Queue()
 
     @property
     def result(self):
@@ -21,21 +20,31 @@ class MultiplePageBot(BaseBot):
     def batch_limit(self, value: int):
         self.__batch_limit = value
 
-    async def run_tasks(self):
-        batch = []
-        for index, elem in enumerate(self.__task_list):
-            if (index+1) % self.batch_limit == 0:
-                await asyncio.gather(*batch)
-                batch = []
-            else:
-                batch.append(elem)
+    async def handle_task(self):
+        while True:
+            task = await self.__queue.get()
+            await task
+            self.__queue.task_done()
+            await asyncio.sleep(1)
 
-    async def __send_request(self, data, method):
-        self.__result.append(await self.send_request(data, method))
+
+    async def run_tasks(self):
+        tasks = []
+        for _ in range(5):
+            task = asyncio.create_task(self.handle_task())
+            tasks.append(task)
+        await self.__queue.join()
+        for task in tasks:
+                task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     def create_task(self, params, method):
-        self.__task_list.append(asyncio.create_task(
-            self.__send_request(params, method)))
+        self.__queue.put_nowait(self.__gather_result(params, method))
+
+    async def __gather_result(self, params, method):
+        result = await self.send_request(params, method)
+        print(result)
+        self.__result.append(result)
 
     async def query_page_loop(self, query_param, result_key):
         looping = True

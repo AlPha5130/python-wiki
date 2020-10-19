@@ -10,7 +10,6 @@ class BaseBot(object):
     def __init__(self, sitename: str, username: str, password: str, api_loc: str):
         self.__client = httpx.AsyncClient()
         self.__sitename = sitename
-        self.__api_loc = api_loc
         self.__username = username
         self.__password = password
         self.__url = f'{sitename}{api_loc}'
@@ -68,8 +67,8 @@ class BaseBot(object):
         data = await self.send_request(token_param, 'get')
         return data['query']['tokens']
 
-    def print_page(self, page, params=None):
+    def print_page(self, page, **kwargs):
         print(f"\n>>> {page} <<<")
-        if params:
-            print(*(f"{k}: {v}" for k, v in params.items()),
+        if kwargs:
+            print(*(f"{k}: {v}" for k, v in kwargs.items()),
                   sep='\n', end='\n\n')

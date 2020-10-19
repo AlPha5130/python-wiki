@@ -3,19 +3,12 @@ import asyncio
 
 
 class CreateRedirectBot(MultiplePageBot):
-    async def __init__(self, sitename, username, password, api_loc):
-        await super().__init__(sitename, username, password, api_loc)
+    def __init__(self, sitename, username, password, api_loc):
+        super().__init__(sitename, username, password, api_loc)
 
     async def create_redirect(self, file: str):
-        client = self.client
-        csrf_token_param = {
-            "action": "query",
-            "meta": "tokens",
-            "format": "json"
-        }
-        response = await client.get(self.url, params=csrf_token_param)
-        data = response.json()
-        csrf_token = data['query']['tokens']['csrftoken']
+        tokens = await self.get_token('csrf')
+        csrf_token = tokens['csrftoken']
         for p in open(file, 'r', encoding='utf8'):
             page = p.strip()
             dest_page = page[page.find(":") + 1:]
@@ -29,7 +22,7 @@ class CreateRedirectBot(MultiplePageBot):
                 "format": "json",
                 "token": csrf_token
             }
-            self.create_task(create_param)
+            self.create_task(create_param, 'post')
         await self.run_tasks()
         self.__handle_result()
 
@@ -43,8 +36,9 @@ class CreateRedirectBot(MultiplePageBot):
 
 if __name__ == '__main__':
     async def main():
-        bot = await CreateRedirectBot('https://minecraft-zh.gamepedia.com',
-                                      'MyNe70bot@Misaka', 'kgsvs6mil2hsqkorp9v5eec9f57c3tgs', '/api.php')
-        await bot.create_redirect("page.txt")
+        bot = CreateRedirectBot('https://minecraft-zh.gamepedia.com',
+                                'MyNe70bot@Misaka', 'kgsvs6mil2hsqkorp9v5eec9f57c3tgs', '/api.php')
+        await bot.login()
+        await bot.create_redirect("list.txt")
         await asyncio.sleep(1)
     asyncio.run(main())

@@ -2,3 +2,7 @@ __pycache__
 *.txt
 *.text~
 test.py
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
