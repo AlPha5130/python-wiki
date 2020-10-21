@@ -28,8 +28,7 @@ class BaseBot(object):
 
     async def login(self):
         print(f'Logging into {self.sitename} ...')
-        tokens = await self.get_token('login')
-        login_token = tokens['logintoken']
+        login_token = (await self.get_token('login'))['logintoken']
         login_param = {
             "action": "login",
             "lgname": self.username,
@@ -47,7 +46,7 @@ class BaseBot(object):
 
     async def close(self):
         await self.__client.aclose()
-    
+
     async def send_request(self, data, method):
         if method == 'get':
             response = await self.__client.get(self.url, params=data)
@@ -64,8 +63,24 @@ class BaseBot(object):
             "type": type,
             "format": "json",
         }
-        data = await self.send_request(token_param, 'get')
-        return data['query']['tokens']
+        return (await self.send_request(token_param, 'get'))['query']['tokens']
+
+    async def query_page_loop(self, query_param, result_key):
+        looping = True
+        result = []
+        while looping:
+            data = await self.send_request(query_param, 'get')
+            if 'continue' in data:
+                continue_param = data['continue']
+                query_param |= continue_param
+            else:
+                looping = False
+            pages = data['query'][result_key]
+            if len(pages) == 0:
+                looping = False
+            else:
+                result.extend(pages)
+        return result
 
     def print_page(self, page, **kwargs):
         print(f"\n>>> {page} <<<")

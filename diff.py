@@ -24,7 +24,7 @@ class DiffBot(BaseBot):
     def __get_comp(self, compare_string):
         comparands = {'diff-line': [],
                       'deleted-context': [], 'added-context': []}
-        soup = BeautifulSoup(compare_string, 'lxml')
+        soup = BeautifulSoup(compare_string, features="html.parser")
         for change_type, css_class in (('diff-line', 'diff-lineno'), ('deleted-context', 'diff-deletedline'), ('added-context', 'diff-addedline')):
             crutons = soup.find_all('td', class_=css_class)
             for cruton in crutons:

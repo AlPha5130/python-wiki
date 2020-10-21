@@ -12,14 +12,6 @@ class MultiplePageBot(BaseBot):
     def result(self):
         return self.__result
 
-    @property
-    def batch_limit(self):
-        return self.__batch_limit
-
-    @batch_limit.setter
-    def batch_limit(self, value: int):
-        self.__batch_limit = value
-
     async def handle_task(self):
         while True:
             task = await self.__queue.get()
@@ -45,20 +37,3 @@ class MultiplePageBot(BaseBot):
         result = await self.send_request(params, method)
         print(result)
         self.__result.append(result)
-
-    async def query_page_loop(self, query_param, result_key):
-        looping = True
-        result = []
-        while looping:
-            data = await self.send_request(query_param, 'get')
-            if 'continue' in data:
-                continue_param = data['continue']
-                query_param.update(continue_param)
-            else:
-                looping = False
-            pages = data['query'][result_key]
-            if len(pages) == 0:
-                looping = False
-            else:
-                result.extend(pages)
-        return result
